@@ -3,7 +3,7 @@ require_once ("../../include/initialize.php");
 	  if (!isset($_SESSION['ADMIN_USERID'])){
       redirect(web_root."admin/index.php");
      }
-
+include '../classes/Encryption.php';
 $action = (isset($_GET['action']) && $_GET['action'] != '') ? $_GET['action'] : '';
 
 switch ($action) {
@@ -28,18 +28,18 @@ switch ($action) {
    
 	function doInsert(){
 		if(isset($_POST['save'])){
-
-
+			
 		if ($_POST['U_NAME'] == "" OR $_POST['U_USERNAME'] == "" OR $_POST['U_PASS'] == "") {
 			$messageStats = false;
 			message("All field is required!","error");
 			redirect('index.php?view=add');
-		}else{	
+		}else{
+			$encryption = new Encryption('bZKn8iklVOQr7eC8ONvnCeRFBJwWo1PG');	
 			$user = New User();
 			$user->USERID 			= $_POST['user_id'];
 			$user->FULLNAME 		= $_POST['U_NAME'];
 			$user->USERNAME			= $_POST['U_USERNAME'];
-			$user->PASS				=sha1($_POST['U_PASS']);
+			$user->PASS				= $encryption->encrypt($_POST['U_PASS']);
 			$user->ROLE				=  $_POST['U_ROLE'];
 			$user->create();
 
@@ -57,11 +57,11 @@ switch ($action) {
 	function doEdit(){
 	if(isset($_POST['save'])){
 
-
+			$encryption = new Encryption('bZKn8iklVOQr7eC8ONvnCeRFBJwWo1PG');	
 			$user = New User(); 
 			$user->FULLNAME 		= $_POST['U_NAME'];
 			$user->USERNAME			= $_POST['U_USERNAME'];
-			$user->PASS				=sha1($_POST['U_PASS']);
+			$user->PASS				= $encryption->encrypt($_POST['U_PASS']);
 			$user->ROLE				= $_POST['U_ROLE'];
 			$user->update($_POST['USERID']);
 
